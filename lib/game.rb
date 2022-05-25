@@ -1,19 +1,27 @@
+require 'colorize'
+require 'pry-byebug'
+
 class Player
-  attr_reader :name, :color_code, :color_english
-  def initialize(name, color_code, color_english)
+  attr_reader :name, :color_english
+  def initialize(name, color_english)
     @name = name
-    @color_code = color_code
     @color_english = color_english
-    puts "#{@name} will be #{color_code} #{@color_english}."
+    color_code = if @color_english == "Y"
+      "\u{25CF} ".yellow
+    else
+      "\u{25CF} ".red
+    end
+    puts "#{@name} will be #{color_code}#{@color_english}."
   end
 end
 
 class ConnectFour
-  attr_reader :player_one, :player_two, :players
-  def initialize(player_one = Player.new(ask_name(1), "\u{1f7e1}", "yellow"), player_two = Player.new(ask_name(2), "\u{1f534}", "red"))
+  attr_reader :player_one, :player_two, :players, :board
+  def initialize(player_one = Player.new(ask_name(1), "Y"), player_two = Player.new(ask_name(2), "R"), board = Array.new(6) { Array.new(7,0) })
     @player_one = player_one
     @player_two = player_two
     @players = [@player_one, @player_two]
+    @board = board
   end
 
   def ask_name(num)
@@ -44,6 +52,45 @@ class ConnectFour
 
   def verify_input(user_input)
     return user_input if user_input.between?(1,7)
+  end
+
+  def full_col?(col)
+    if @board[5][col].eql?(0)
+      true
+    else
+      false
+    end
+  end
+
+  def show_interface
+    row_string = ''
+    @board.each do |row|
+      row.each do |col|
+        case col
+        when "Y"
+          row_string << "\u{25CF} ".yellow
+        when "R"
+          row_string << "\u{25CF} ".red
+        else
+          row_string << "\u{25CF} ".blue
+        end
+      end
+      puts "#{row_string}\n"
+      row_string = ''
+    end
+    puts ""
+  end
+
+  def update_board(col, player)
+    # byebug
+    i = 0
+    while i < @board.length
+      if i.eql?(@board.length-1) || @board[i+1][col].eql?("Y") || @board[i+1][col].eql?("R")
+        @board[i][col] = player.color_english
+        break
+      end
+      i += 1
+    end
   end
 end
 

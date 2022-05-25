@@ -2,22 +2,18 @@ require_relative '../lib/game'
 
 describe ConnectFour do
 
-  let(:one) { instance_double(Player, name: 'Raymart', color_code: "\u{1f7e1}", color_english: "yellow") }
-  let(:two) { instance_double(Player, name: 'Raylph', color_code: "\u{1f534}", color_english: "red") }
-  subject(:game) { described_class.new(one, two) }
+  let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+  let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+  subject(:game) { described_class.new(one, two, Array.new(6) { Array.new(7) }) }
 
   describe '#initialize' do
     context 'when player one is initialized' do
       it 'is a valid player name' do
         expect(one.name).to eq('Raymart')
       end
-      
-      it 'matches color code' do
-        expect(one.color_code).to eq("\u{1f7e1}")
-      end
 
       it 'matches color name' do
-        expect(one.color_english).to eq('yellow')
+        expect(one.color_english).to eq('Y')
       end
     end
 
@@ -26,12 +22,8 @@ describe ConnectFour do
         expect(two.name).to eq('Raylph')
       end
 
-      it 'matches color code' do
-        expect(two.color_code).to eq("\u{1f534}")
-      end
-
       it 'matches color name' do
-        expect(two.color_english).to eq('red')
+        expect(two.color_english).to eq('R')
       end
     end
   end
@@ -88,15 +80,61 @@ describe ConnectFour do
   end
 
   describe '#full_col?' do
-  end
+    context 'when the column is not full' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      subject(:not_full) { described_class.new(one, two, connect_four) }
 
-  describe '#create_interface' do
+      it 'returns false' do
+        col = 0
+        expect(not_full).to receive(:full_col?).and_return(false)
+        not_full.full_col?(col)
+      end
+    end
+
+    context 'when the column is full' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      connect_four[5][0] = 'Y'
+      subject(:full) { described_class.new(one, two, connect_four) }
+
+      it 'returns true' do
+        col = 0
+        expect(full).to receive(:full_col?).and_return(true)
+        full.full_col?(col)
+      end
+    end
   end
 
   describe '#show_interface' do
   end
 
-  describe '#update_interface' do
+  describe '#update_board' do
+    context 'when column is not full and doesnt have any pieces' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:updated) { described_class.new(one, two, connect_four) }
+
+      it 'updates board' do
+        col = 0
+        updated.update_board(col, one)
+        expect(connect_four).to eq([
+          [0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0],
+          ["Y", 0, 0, 0, 0, 0, 0]
+        ])
+      end
+    end
+    context 'when column is not full and has one piece' do
+      it 'updates board' do
+      end
+    end
+    context 'when column is full' do
+      it 'doesnt update board' do
+      end
+    end
   end
 
   describe '#game_over?' do

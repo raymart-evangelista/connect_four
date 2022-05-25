@@ -1,0 +1,62 @@
+require 'colorize'
+require 'pry-byebug'
+connect_four =
+[
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0]
+]
+
+# connect_four[4][0] = "Y"
+# connect_four[5][0] = "Y"
+i = 5
+j = 0
+# connect_four[i][j] = "Y"
+# keep traversing down the rows "i" until the next one is nil, or "Y" or "R"
+
+def update(col, connect_four, color)
+  i = 0
+  # while i < connect_four.length || !connect_four[i][col].eq("Y") || !connect_four[i][col].eq("R")
+  while i < connect_four.length
+    # byebug
+    if i.eql?(connect_four.length-1) || connect_four[i+1][col].eql?("Y") || connect_four[i+1][col].eql?("R")
+      connect_four[i][col] = color
+      print(connect_four)
+      break
+    end
+    i += 1
+  end
+end
+
+
+def print(connect_four)
+  row_string = ''
+  connect_four.each do |row|
+   row.each do |col|
+     case col
+     when "Y"
+       row_string << "\u{25CF} ".yellow
+     when "R"
+       row_string << "\u{25CF} ".red
+     else
+       row_string << "\u{25CF} ".blue
+     end
+   end
+   puts "#{row_string}\n"
+   row_string = ''
+  end
+  puts ""
+end
+
+# print(connect_four)
+update(0, connect_four, "Y")
+# update(0, connect_four, "Y")
+# update(0, connect_four, "Y")
+# update(0, connect_four, "Y")
+# update(0, connect_four, "Y")
+# update(0, connect_four, "Y")
+
+p connect_four
