@@ -2,16 +2,16 @@ require 'colorize'
 require 'pry-byebug'
 
 class Player
-  attr_reader :name, :color_english
+  attr_reader :name, :color_english, :color_code
   def initialize(name, color_english)
     @name = name
     @color_english = color_english
-    color_code = if @color_english == "Y"
+    @color_code = if @color_english == "Y"
       "\u{25CF} ".yellow
     else
       "\u{25CF} ".red
     end
-    # puts "#{@name} will be #{color_code}#{@color_english}."
+    puts "#{@name} will be #{@color_code}#{@color_english}."
   end
 end
 
@@ -25,19 +25,34 @@ class ConnectFour
   end
 
   def ask_name(num)
-    puts "Enter name for player #{num}"
+    puts "Enter the name of player #{num}."
     gets.chomp
   end
   
   def play_game
-    @player = @players.shift
-    print_interface
-    column = player_input
-    @players.push(@player)
-  end
-
-  def player_turn
-    puts ""
+    loop do
+      player = @players.shift
+      show_interface
+      puts "#{player.color_code}#{player.name}, enter a column from 1-7: "
+      column = player_input - 1
+      if full_col?(column)
+        loop do
+          column = player_input - 1
+          break unless full_col?(column)
+        end
+      end
+      row = update_board(column, player)
+      if game_over?(row, column, player)
+        show_interface
+        puts "#{player.name} wins!"
+        break
+      elsif draw?
+        show_interface
+        puts "DRAW!"
+        break
+      end
+      @players.push(player)
+    end
   end
 
   def player_input
@@ -55,10 +70,10 @@ class ConnectFour
   end
 
   def full_col?(col)
-    if @board[5][col].eql?(0)
-      true
-    else
+    if @board[0][col].eql?(0)
       false
+    else
+      true
     end
   end
 
@@ -82,7 +97,6 @@ class ConnectFour
   end
 
   def update_board(col, player)
-    # byebug
     i = 0
     while i < @board.length
       if i.eql?(@board.length-1) || @board[i+1][col].eql?("Y") || @board[i+1][col].eql?("R")
@@ -91,6 +105,7 @@ class ConnectFour
       end
       i += 1
     end
+    i
   end
 
   def game_over?(row, col, player)
@@ -111,7 +126,7 @@ class ConnectFour
     if string_horizontal.include?(color)
       return true
     end
-    # byebug
+
     # diagonal
     ## loop from starting position to top-left
     string_diag1 = ""
@@ -162,12 +177,8 @@ class ConnectFour
   end
 
   def draw?
-    byebug
     return true unless @board[0].include?(0)
 
     false
   end
 end
-
-# game = ConnectFour.new
-# game.play_game
