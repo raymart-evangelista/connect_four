@@ -1,4 +1,3 @@
-require 'pry-byebug'
 require 'bundler/inline'
 gemfile true do
   source 'http://rubygems.org'
