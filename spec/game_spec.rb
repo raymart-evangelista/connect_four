@@ -1,10 +1,10 @@
 require_relative '../lib/game'
+require 'pry-byebug'
 
 describe ConnectFour do
-
   let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
   let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
-  subject(:game) { described_class.new(one, two, Array.new(6) { Array.new(7) }) }
+  subject(:game) { described_class.new(one, two, Array.new(6) { Array.new(7,0) }) }
 
   describe '#initialize' do
     context 'when player one is initialized' do
@@ -31,7 +31,7 @@ describe ConnectFour do
   describe '#ask_name' do
   end
 
-  describe '#play_game' do   
+  describe '#play_game' do
   end
 
   describe '#player_input' do
@@ -128,21 +128,224 @@ describe ConnectFour do
       end
     end
     context 'when column is not full and has one piece' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      connect_four[5][0] = "Y"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:updated) { described_class.new(one, two, connect_four) }
+
       it 'updates board' do
+        col = 0
+        updated.update_board(col, one)
+        expect(connect_four).to eq([
+          [0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0],
+          ["Y", 0, 0, 0, 0, 0, 0],
+          ["Y", 0, 0, 0, 0, 0, 0]
+        ])
       end
     end
-    context 'when column is full' do
-      it 'doesnt update board' do
+    context 'when column is not full and has one opening left' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      connect_four[5][6] = "Y"
+      connect_four[4][6] = "Y"
+      connect_four[3][6] = "Y"
+      connect_four[2][6] = "Y"
+      connect_four[1][6] = "Y"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:updated) { described_class.new(one, two, connect_four) }
+
+      it 'updates board' do
+        col = 6
+        updated.update_board(col, one)
+        expect(connect_four).to eq([
+          [0, 0, 0, 0, 0, 0, "Y"],
+          [0, 0, 0, 0, 0, 0, "Y"],
+          [0, 0, 0, 0, 0, 0, "Y"],
+          [0, 0, 0, 0, 0, 0, "Y"],
+          [0, 0, 0, 0, 0, 0, "Y"],
+          [0, 0, 0, 0, 0, 0, "Y"]
+        ])
       end
     end
   end
 
   describe '#game_over?' do
+    context 'when there are four colored pieces in a row in a column' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      connect_four[5][6] = "Y"
+      connect_four[4][6] = "Y"
+      connect_four[3][6] = "Y"
+      connect_four[2][6] = "Y"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:vertical_over) { described_class.new(one, two, connect_four) }
+
+      it 'returns true' do
+        row = 2
+        col = 6
+        expect(vertical_over).to be_game_over(row, col, one)
+      end
+    end
+
+    context 'when there are four colored pieces in a row in a row' do
+      connect_four = Array.new(6) { Array.new(7,0) }
+      connect_four[5][0] = "Y"
+      connect_four[5][1] = "Y"
+      connect_four[5][2] = "Y"
+      connect_four[5][3] = "Y"
+      connect_four[5][4] = "R"
+      connect_four[5][5] = "R"
+      connect_four[5][6] = "R"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:horizontal_over) { described_class.new(one, two, connect_four) }
+
+      it 'returns true' do
+        row = 5
+        col = 3
+        expect(horizontal_over).to be_game_over(row, col, one)
+      end
+    end
+
+    context 'when there are four colored pieces in a row in a top-left to bototm-right diagonal' do
+      connect_four = Array.new(6) { Array.new(7,0) }
+      connect_four[5][4] = "Y"
+      connect_four[4][3] = "Y"
+      connect_four[3][2] = "Y"
+      connect_four[2][1] = "Y"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:diag1_over) { described_class.new(one, two, connect_four) }
+
+      it 'returns true' do
+        row = 2
+        col = 1
+        expect(diag1_over).to be_game_over(row, col, one)
+      end
+    end
+
+    context 'when there are four colored pieces in a row in a top-right to bottom-left diagonal' do
+      connect_four = Array.new(6) { Array.new(7,0) }
+      connect_four[5][0] = "Y"
+      connect_four[4][1] = "Y"
+      connect_four[3][2] = "Y"
+      connect_four[2][3] = "Y"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:diag2_over) { described_class.new(one, two, connect_four) }
+
+      it 'returns true' do
+        row = 2
+        col = 3
+        expect(diag2_over).to be_game_over(row, col, one)
+      end
+    end
+
+    context 'when there arent four colored pieces in a row in a column' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      connect_four[5][6] = "Y"
+      connect_four[4][6] = "Y"
+      connect_four[3][6] = "Y"
+      connect_four[2][6] = "R"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:vertical_false) { described_class.new(one, two, connect_four) }
+
+      it 'returns false' do
+        row = 2
+        col = 6
+        expect(vertical_false).not_to be_game_over(row, col, two)
+      end
+    end
+
+    context 'when there arent four colored pieces in a row in a row' do
+      connect_four = Array.new(6) { Array.new(7, 0) }
+      connect_four[5][0] = "Y"
+      connect_four[5][1] = "Y"
+      connect_four[5][2] = "Y"
+      connect_four[5][3] = "R"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:horizontal_false) { described_class.new(one, two, connect_four) }
+
+      it 'returns false' do
+        row = 5
+        col = 3
+        expect(horizontal_false).not_to be_game_over(row, col, two)
+      end
+    end
+
+    context 'when there arent four colored pieces in a row in a top-left to bottom-right diagonal' do
+      connect_four = Array.new(6) { Array.new(7,0) }
+      connect_four[5][4] = "Y"
+      connect_four[4][3] = "Y"
+      connect_four[3][2] = "Y"
+      connect_four[2][1] = "R"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:diag1_false) { described_class.new(one, two, connect_four) }
+
+      it 'returns false' do
+        row = 2
+        col = 1
+        expect(diag1_false).not_to be_game_over(row, col, two)
+      end
+    end
+
+    context 'when there arent four colored pieces in a row in a top-right to bottom-left diagonal' do
+      connect_four = Array.new(6) { Array.new(7,0) }
+      connect_four[5][0] = "Y"
+      connect_four[4][1] = "Y"
+      connect_four[3][2] = "Y"
+      connect_four[2][3] = "R"
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:diag2_false) { described_class.new(one, two, connect_four) }
+
+      it 'returns false' do
+        row = 2
+        col = 3
+        expect(diag2_false).not_to be_game_over(row, col, two)
+      end
+    end
   end
   
   describe '#draw?' do
-  end
+    context 'when all positions are filled' do
+      connect_four = Array.new(6) { Array.new(7,0) }
+      connect_four[5] = %w[R Y R Y R Y R]
+      connect_four[4] = %w[R Y R Y R Y R]
+      connect_four[3] = %w[R Y R Y R Y R]
+      connect_four[2] = %w[Y R Y R Y R Y]
+      connect_four[1] = %w[Y R Y R Y R Y]
+      connect_four[0] = %w[Y R Y R Y R Y]
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:draw_true) { described_class.new(one, two, connect_four) }
 
-  describe '#winner?' do
+      it 'returns true' do
+        expect(draw_true).to be_draw
+      end
+    end
+
+    context 'when not all positions are filled' do
+      connect_four = Array.new(6) { Array.new(7,0) }
+      connect_four[5] = %w[R Y R Y R Y R]
+      connect_four[4] = %w[R Y R Y R Y R]
+      connect_four[3] = %w[R Y R Y R Y R]
+      connect_four[2] = %w[Y R Y R Y R Y]
+      connect_four[1] = %w[Y R Y R Y R Y]
+      let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
+      let(:two) { instance_double(Player, name: 'Raylph', color_english: "R") }
+      subject(:draw_false) { described_class.new(one, two, connect_four) }
+
+      it 'returns false' do
+        expect(draw_false).not_to be_draw
+      end
+    end
   end
 end
