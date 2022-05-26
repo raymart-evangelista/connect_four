@@ -1,5 +1,9 @@
-require 'colorize'
 require 'pry-byebug'
+require 'bundler/inline'
+gemfile true do
+  source 'http://rubygems.org'
+  gem 'colorize'
+end
 
 class Player
   attr_reader :name, :color_english, :color_code
