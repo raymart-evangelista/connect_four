@@ -1,5 +1,4 @@
 require_relative '../lib/game'
-require 'pry-byebug'
 
 describe ConnectFour do
   let(:one) { instance_double(Player, name: 'Raymart', color_english: "Y") }
