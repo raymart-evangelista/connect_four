@@ -1,1 +1,5 @@
 # connect_four
+
+With this project, the goal was to create a Connect Four game using Test Driven Development. The whole purpose was to focus on writing tests first before implementing the code. When I first started writing tests, I didn't know how to start, but as soon as I got a couple methods to test, I started getting in the routine of deciding what the method's purpose was first, then deciding to create tests based on the purpose, then implementing the method. I would refactor my implemented code a lot based on the results of the tests. Sometimes the output wasn't what I expected, and it led me to refactor my code accordingly.
+
+Although RSpec is still something I just recently learned, I know that based off the RSpec exercises and this project, I have more knowledge and understanding of how to implement tests and do Test Driven Development when creating projects. Resources such as previous RSpec lesson material, Google and Youtube also helped a great deal when completing the RSpec portion of this project.
